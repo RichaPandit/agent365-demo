@@ -1,4 +1,4 @@
-# Microsoft Agent 365 — Investment & Wealth Management Demo
+# Microsoft Agent 365 - Investment & Wealth Management Demo
 > **Giving AI Agents Their Identity in a Regulated Finance Environment**
 > 
 > A Day 1 hands-on demo showing how to use Microsoft Agent 365 and the
