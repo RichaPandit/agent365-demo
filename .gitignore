@@ -1,6 +1,7 @@
 # Secrets - never commit these
 .env
 *.json
+agent-estate-audit.csv
 
 # Python
 __pycache__/
