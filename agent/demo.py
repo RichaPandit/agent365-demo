@@ -42,7 +42,15 @@ def show(title: str, jwt: str) -> None:
 def user_token() -> str:
     """The 'front end' signs the user in and asks for the agent's access_agent scope."""
     app = msal.PublicClientApplication(FRONTEND, authority=f"https://login.microsoftonline.com/{TENANT}")
-    flow = app.initiate_device_flow(scopes=[f"api://{BLUEPRINT}/access_agent"])
+    scope = f"api://{BLUEPRINT}/access_agent"
+
+    flow = app.initiate_device_flow(scopes=[scope])
+
+    if "user_code" not in flow:
+        print("\nDevice flow initialization failed.")
+        print(json.dumps(flow, indent=2))
+        sys.exit(1)
+
     print(flow["message"])
     result = app.acquire_token_by_device_flow(flow)
     if "access_token" not in result:
