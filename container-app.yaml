@@ -1,0 +1,33 @@
+containers:
+
+  - name: portfolio-risk-monitor
+    image: <your-acr>/portfolio-risk-monitor:v1
+
+    env:
+      - name: SIDECAR_URL
+        value: "http://localhost:5000"
+
+  - name: entra-auth-sidecar
+    image: mcr.microsoft.com/entra-sdk/auth-sidecar:1.0.0
+
+    env:
+      - name: AzureAd__Instance
+        value: "https://login.microsoftonline.com/"
+
+      - name: AzureAd__TenantId
+        value: "<TENANT_ID>"
+
+      - name: AzureAd__ClientId
+        value: "<BLUEPRINT_APP_ID>"
+
+      - name: AzureAd__ClientCredentials__0__SourceType
+        value: "ClientSecret"
+
+      - name: AzureAd__ClientCredentials__0__ClientSecret
+        secretRef: blueprint-secret
+
+      - name: DownstreamApis__Graph__BaseUrl
+        value: "https://graph.microsoft.com/v1.0"
+
+      - name: DownstreamApis__Graph__Scopes
+        value: "User.Read"
