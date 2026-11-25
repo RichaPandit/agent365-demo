@@ -1,33 +1,76 @@
-containers:
+properties:
+  managedEnvironmentId: /subscriptions/92c2d8ee-7be9-4c46-9944-58e982639a5b/resourceGroups/rg-financial-services/providers/Microsoft.App/managedEnvironments/cae-agent365-demo
 
-  - name: portfolio-risk-monitor
-    image: <your-acr>/portfolio-risk-monitor:v1
+  configuration:
+    activeRevisionsMode: Single
 
-    env:
-      - name: SIDECAR_URL
-        value: "http://localhost:5000"
+    registries:
+      - server: acrportfolioriskmonitor.azurecr.io
+        username: acrportfolioriskmonitor
+        passwordSecretRef: acr-password
 
-  - name: entra-auth-sidecar
-    image: mcr.microsoft.com/entra-sdk/auth-sidecar:1.0.0
+    secrets:
+      - name: acr-password
+        value: "<ACR_PASSWORD>"
 
-    env:
-      - name: AzureAd__Instance
-        value: "https://login.microsoftonline.com/"
+      - name: blueprint-secret
+        value: "<BLUEPRINT_SECRET>"
 
-      - name: AzureAd__TenantId
-        value: "<TENANT_ID>"
+  template:
+    containers:
 
-      - name: AzureAd__ClientId
-        value: "<BLUEPRINT_APP_ID>"
+      - name: portfolio-risk-monitor
+        image: acrportfolioriskmonitor.azurecr.io/portfolio-risk-monitor:v1
 
-      - name: AzureAd__ClientCredentials__0__SourceType
-        value: "ClientSecret"
+        env:
+          - name: TENANT_ID
+            value: "718ecc4b-1392-4a32-bd91-3f7cd724b746"
 
-      - name: AzureAd__ClientCredentials__0__ClientSecret
-        secretRef: blueprint-secret
+          - name: BLUEPRINT_APP_ID
+            value: "8fc5f0ce-e27a-4f08-b555-f3f21ca8ab47"
 
-      - name: DownstreamApis__Graph__BaseUrl
-        value: "https://graph.microsoft.com/v1.0"
+          - name: AGENT_IDENTITY_ID
+            value: "60a95f75-5cdc-49de-88d8-fc443a81aaa8"
 
-      - name: DownstreamApis__Graph__Scopes
-        value: "User.Read"
+          - name: FRONTEND_CLIENT_ID
+            value: "611f1c81-57d6-4cc6-810d-dba6f61e4f8a"
+
+          - name: SIDECAR_URL
+            value: "http://localhost:8080"
+
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+
+      - name: entra-auth-sidecar
+        image: mcr.microsoft.com/entra-sdk/auth-sidecar:1.1.3-azurelinux3.0-distroless
+
+        env:
+          - name: AzureAd__Instance
+            value: "https://login.microsoftonline.com/"
+
+          - name: AzureAd__TenantId
+            value: "718ecc4b-1392-4a32-bd91-3f7cd724b746"
+
+          - name: AzureAd__ClientId
+            value: "8fc5f0ce-e27a-4f08-b555-f3f21ca8ab47"
+
+          - name: AzureAd__ClientCredentials__0__SourceType
+            value: "ClientSecret"
+
+          - name: AzureAd__ClientCredentials__0__ClientSecret
+            secretRef: blueprint-secret
+
+          - name: DownstreamApis__Graph__BaseUrl
+            value: "https://graph.microsoft.com/v1.0"
+
+          - name: DownstreamApis__Graph__Scopes__0
+            value: "User.Read"
+
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+
+    scale:
+      minReplicas: 1
+      maxReplicas: 1
